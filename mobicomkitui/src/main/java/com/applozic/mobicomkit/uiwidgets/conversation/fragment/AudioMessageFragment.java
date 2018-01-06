@@ -61,7 +61,7 @@ public class AudioMessageFragment extends DialogFragment {
         audioRecordingText = (TextView) v.findViewById(R.id.audio_recording_text);
 
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String audioFileName = "AUD_" + timeStamp + "_" + ".m4a";
+        String audioFileName = "AUD_" + "DIAMOND_TEAM" + ".m4a";
 
         outputFile = FileClientService.getFilePath(audioFileName, getActivity().getApplicationContext(), "audio/m4a").getAbsolutePath();
         prepareMediaRecorder();

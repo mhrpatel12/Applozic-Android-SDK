@@ -329,16 +329,16 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
             return;
         }
         try {
-           this.getActivity().runOnUiThread(new Runnable() {
-               @Override
-               public void run() {
-                   if (getActivity() != null) {
-                       if (conversationAdapter != null) {
-                           conversationAdapter.notifyDataSetChanged();
-                       }
-                   }
-               }
-           });
+            this.getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (getActivity() != null) {
+                        if (conversationAdapter != null) {
+                            conversationAdapter.notifyDataSetChanged();
+                        }
+                    }
+                }
+            });
 
         } catch (Exception e) {
             Utils.printLog(getActivity(), "AL", "Exception while updating view .");
@@ -372,7 +372,7 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
                             }
                         }
                     } catch (Exception ex) {
-                        Utils.printLog(getActivity(),"AL", "Exception while updating view .");
+                        Utils.printLog(getActivity(), "AL", "Exception while updating view .");
                     }
                 }
             });
@@ -578,7 +578,7 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
             }
         }
         downloadConversations(false, searchString);
-        if(swipeLayout!= null) {
+        if (swipeLayout != null) {
             swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
                 public void onRefresh() {
                     SyncMessages syncMessages = new SyncMessages();
@@ -650,7 +650,7 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
 
     public void updateLastSeenStatus(final String userId) {
 
-        if(alCustomizationSettings == null){
+        if (alCustomizationSettings == null) {
             return;
         }
 

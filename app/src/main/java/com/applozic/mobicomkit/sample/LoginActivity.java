@@ -79,6 +79,7 @@ public class LoginActivity extends Activity implements ActivityCompat.OnRequestP
     private EditText mUserIdView;
     private EditText mPhoneNumberView;
     private EditText mPasswordView;
+    private EditText mConfirmPasswordView;
     private EditText mDisplayName;
     private View mProgressView;
     private View mLoginFormView;
@@ -105,6 +106,7 @@ public class LoginActivity extends Activity implements ActivityCompat.OnRequestP
         mPhoneNumberView = (EditText) findViewById(R.id.phoneNumber);
         mUserIdView = (EditText) findViewById(R.id.userId);
         mPasswordView = (EditText) findViewById(R.id.password);
+        mConfirmPasswordView = (EditText) findViewById(R.id.confirmPassword);
         mDisplayName = (EditText) findViewById(R.id.displayName);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -235,6 +237,12 @@ public class LoginActivity extends Activity implements ActivityCompat.OnRequestP
             focusView = mPasswordView;
             cancel = true;
         }
+        // Check either entered password matches or not
+        if (!(mPasswordView.getText() + "").equals(mConfirmPasswordView.getText() + "")) {
+            mConfirmPasswordView.setError(getString(R.string.error_password_not_matching));
+            focusView = mConfirmPasswordView;
+            cancel = true;
+        }
 
         // Check for a valid email address.
         if (TextUtils.isEmpty(email)) {
@@ -268,7 +276,7 @@ public class LoginActivity extends Activity implements ActivityCompat.OnRequestP
                     //Basic settings...
 
                     ApplozicClient.getInstance(context).setContextBasedChat(true).setHandleDial(true);
-
+                    ApplozicSetting.getInstance(context).enableRegisteredUsersContactCall();
                     Map<ApplozicSetting.RequestCode, String> activityCallbacks = new HashMap<ApplozicSetting.RequestCode, String>();
                     activityCallbacks.put(ApplozicSetting.RequestCode.USER_LOOUT, LoginActivity.class.getName());
                     ApplozicSetting.getInstance(context).setActivityCallbacks(activityCallbacks);
@@ -297,8 +305,8 @@ public class LoginActivity extends Activity implements ActivityCompat.OnRequestP
                     buildContactData();
 
                     //starting main MainActivity
-                    Intent mainActvity = new Intent(context, MainActivity.class);
-                    startActivity(mainActvity);
+/*                    Intent mainActvity = new Intent(context, MainActivity.class);
+                    startActivity(mainActvity);*/
                     Intent intent = new Intent(context, ConversationActivity.class);
                     if (ApplozicClient.getInstance(LoginActivity.this).isContextBasedChat()) {
                         intent.putExtra(ConversationUIService.CONTEXT_BASED_CHAT, true);
@@ -314,7 +322,7 @@ public class LoginActivity extends Activity implements ActivityCompat.OnRequestP
 
                     mEmailSignInButton.setVisibility(View.VISIBLE);
                     AlertDialog alertDialog = new AlertDialog.Builder(LoginActivity.this).create();
-                    alertDialog.setTitle(getString(R.string.text_alert));
+                    alertDialog.setTitle(getString(R.string.text_alert_diamond));
                     alertDialog.setMessage(exception.toString());
                     alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, getString(R.string.ok_alert),
                             new DialogInterface.OnClickListener() {
@@ -504,7 +512,7 @@ public class LoginActivity extends Activity implements ActivityCompat.OnRequestP
 
             Snackbar.make(layout, R.string.contact_permission,
                     Snackbar.LENGTH_INDEFINITE)
-                    .setAction(R.string.ok_alert, new View.OnClickListener() {
+                    .setAction(R.string.ok_alert, new OnClickListener() {
                         @Override
                         public void onClick(View view) {
                             ActivityCompat

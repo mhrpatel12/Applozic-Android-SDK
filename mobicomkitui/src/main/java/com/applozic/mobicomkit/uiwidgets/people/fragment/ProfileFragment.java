@@ -41,6 +41,7 @@ import com.applozic.mobicomkit.contact.AppContactService;
 import com.applozic.mobicomkit.uiwidgets.AlCustomizationSettings;
 import com.applozic.mobicomkit.uiwidgets.ApplozicSetting;
 import com.applozic.mobicomkit.uiwidgets.R;
+import com.applozic.mobicomkit.uiwidgets.conversation.activity.ConversationActivity;
 import com.applozic.mobicomkit.uiwidgets.conversation.fragment.PictureUploadPopUpFragment;
 import com.applozic.mobicomkit.uiwidgets.instruction.ApplozicPermissions;
 import com.applozic.mobicommons.commons.core.utils.PermissionsUtils;
@@ -102,7 +103,7 @@ public class ProfileFragment extends Fragment {
         displayNameText = (TextView) view.findViewById(R.id.applozic_profile_displayname);
         statusText = (TextView) view.findViewById(R.id.applozic_profile_status);
         contactNumberText = (TextView) view.findViewById(R.id.applozic_profile_contact);
-        applozicProfileContactLayout =  (RelativeLayout)view.findViewById(R.id.applozic_profile_contact_section_rl);
+        applozicProfileContactLayout = (RelativeLayout) view.findViewById(R.id.applozic_profile_contact_section_rl);
 
         setupDeviderView(view, R.id.applozic_profile_section_rl, R.id.applozic_profile_verticalline_rl);
         setupDeviderView(view, R.id.applozic_datausage_section_rl, R.id.applozic_datausage_verticalline_rl);
@@ -114,6 +115,9 @@ public class ProfileFragment extends Fragment {
         toolbar.setSubtitle("");
         setHasOptionsMenu(true);
 
+        ((ConversationActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ((ConversationActivity) getActivity()).getSupportActionBar().setHomeButtonEnabled(true);
+
         contactService = new AppContactService(getActivity());
         userContact = contactService.getContactById(MobiComUserPreference.getInstance(getActivity()).getUserId());
         if (!TextUtils.isEmpty(userContact.getDisplayName())) {
@@ -124,7 +128,7 @@ public class ProfileFragment extends Fragment {
         }
         if (!TextUtils.isEmpty(userContact.getContactNumber())) {
             contactNumberText.setText(userContact.getContactNumber());
-        }else {
+        } else {
             applozicProfileContactLayout.setVisibility(View.GONE);
         }
 
@@ -264,6 +268,19 @@ public class ProfileFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        ((ConversationActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        ((ConversationActivity) getActivity()).getSupportActionBar().setHomeButtonEnabled(false);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((ConversationActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ((ConversationActivity) getActivity()).getSupportActionBar().setHomeButtonEnabled(true);
+    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -295,35 +312,35 @@ public class ProfileFragment extends Fragment {
 
     public void processPhotoOption() {
         try {
-        if (PermissionsUtils.isCameraPermissionGranted(getContext()) && !PermissionsUtils.checkSelfForStoragePermission(getActivity())) {
+            if (PermissionsUtils.isCameraPermissionGranted(getContext()) && !PermissionsUtils.checkSelfForStoragePermission(getActivity())) {
 
-            new Handler().post(new Runnable() {
-                public void run() {
-                    FragmentManager supportFragmentManager = getActivity().getSupportFragmentManager();
-                    DialogFragment fragment = new PictureUploadPopUpFragment();
-                    fragment.setTargetFragment(ProfileFragment.this, REQUEST_CODE_ATTACH_PHOTO);
-                    FragmentTransaction fragmentTransaction = supportFragmentManager
-                            .beginTransaction();
-                    Fragment prev = getFragmentManager().findFragmentByTag("PhotosAttachmentFragment");
-                    if (prev != null) {
-                        fragmentTransaction.remove(prev);
+                new Handler().post(new Runnable() {
+                    public void run() {
+                        FragmentManager supportFragmentManager = getActivity().getSupportFragmentManager();
+                        DialogFragment fragment = new PictureUploadPopUpFragment();
+                        fragment.setTargetFragment(ProfileFragment.this, REQUEST_CODE_ATTACH_PHOTO);
+                        FragmentTransaction fragmentTransaction = supportFragmentManager
+                                .beginTransaction();
+                        Fragment prev = getFragmentManager().findFragmentByTag("PhotosAttachmentFragment");
+                        if (prev != null) {
+                            fragmentTransaction.remove(prev);
+                        }
+                        fragmentTransaction.addToBackStack(null);
+                        fragment.show(fragmentTransaction, "PhotosAttachmentFragment");
                     }
-                    fragmentTransaction.addToBackStack(null);
-                    fragment.show(fragmentTransaction, "PhotosAttachmentFragment");
-                }
-            });
+                });
 
-        } else {
-            if (Utils.hasMarshmallow()) {
-                if (PermissionsUtils.checkSelfForCameraPermission(getActivity())) {
-                    applozicPermissions.requestCameraPermissionForProfilePhoto();
-                } else {
-                    applozicPermissions.requestStoragePermissionsForProfilePhoto();
-                }
             } else {
-                processPhotoOption();
+                if (Utils.hasMarshmallow()) {
+                    if (PermissionsUtils.checkSelfForCameraPermission(getActivity())) {
+                        applozicPermissions.requestCameraPermissionForProfilePhoto();
+                    } else {
+                        applozicPermissions.requestStoragePermissionsForProfilePhoto();
+                    }
+                } else {
+                    processPhotoOption();
+                }
             }
-        }
         } catch (Exception e) {
 
         }
@@ -341,14 +358,14 @@ public class ProfileFragment extends Fragment {
             super.onActivityResult(requestCode, resultCode, intent);
             File file = FileClientService.getFilePath(DEFAULT_CONATCT_IMAGE, getContext(), "image", true);
             if (file == null || !file.exists()) {
-                Utils.printLog(getActivity(),TAG, "file not found,exporting it from drawable");
+                Utils.printLog(getActivity(), TAG, "file not found,exporting it from drawable");
                 Bitmap bm = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.applozic_ic_contact_picture_180_holo_light);
                 String filePath = ImageUtils.saveImageToInternalStorage(FileClientService.getFilePath(DEFAULT_CONATCT_IMAGE, getActivity().getApplicationContext(), "image", true), bm);
                 file = new File(filePath);
             }
             handleProfileimageUpload(false, Uri.parse(file.getAbsolutePath()), file);
         } else {
-            Utils.printLog(getActivity(),TAG, "Activity result failed with code: " + resultCode);
+            Utils.printLog(getActivity(), TAG, "Activity result failed with code: " + resultCode);
         }
     }
 
@@ -441,7 +458,7 @@ public class ProfileFragment extends Fragment {
                     contactNumberTextView.setText(contactNumber);
                 }
             }
-            if(progressDialog.isShowing()){
+            if (progressDialog.isShowing()) {
                 progressDialog.dismiss();
             }
         }

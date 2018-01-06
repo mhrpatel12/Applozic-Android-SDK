@@ -20,6 +20,7 @@ import com.applozic.mobicomkit.contact.AppContactService;
 import com.applozic.mobicomkit.uiwidgets.R;
 import com.applozic.mobicomkit.uiwidgets.alphanumbericcolor.AlphaNumberColorUtil;
 import com.applozic.mobicomkit.uiwidgets.conversation.ConversationUIService;
+import com.applozic.mobicomkit.uiwidgets.conversation.activity.ConversationActivity;
 import com.applozic.mobicommons.commons.image.ImageLoader;
 import com.applozic.mobicommons.commons.image.ImageUtils;
 import com.applozic.mobicommons.people.contact.Contact;
@@ -120,6 +121,8 @@ public class UserProfileFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        ((ConversationActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ((ConversationActivity) getActivity()).getSupportActionBar().setHomeButtonEnabled(true);
         if (contact != null) {
             BroadcastService.currentUserProfileUserId = contact.getUserId();
             refreshContactData();

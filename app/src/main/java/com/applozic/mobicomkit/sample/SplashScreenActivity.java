@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 
 import com.applozic.mobicomkit.api.account.user.MobiComUserPreference;
+import com.applozic.mobicomkit.uiwidgets.conversation.activity.ConversationActivity;
 
 /**
  * Created by sunil on 21/12/2016.
@@ -22,7 +23,7 @@ public class SplashScreenActivity extends Activity {
             @Override
             public void run() {
                 if (MobiComUserPreference.getInstance(SplashScreenActivity.this).isLoggedIn()) {
-                    Intent mainIntent = new Intent(SplashScreenActivity.this, MainActivity.class);
+                    Intent mainIntent = new Intent(SplashScreenActivity.this, ConversationActivity.class);
                     SplashScreenActivity.this.startActivity(mainIntent);
                     SplashScreenActivity.this.finish();
                 } else {

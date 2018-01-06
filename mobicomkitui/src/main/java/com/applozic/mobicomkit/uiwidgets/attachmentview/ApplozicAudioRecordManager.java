@@ -25,7 +25,7 @@ public class ApplozicAudioRecordManager implements MediaRecorder.OnInfoListener,
 
 
     public ApplozicAudioRecordManager(FragmentActivity context) {
-        this.conversationUIService  = new ConversationUIService(context);
+        this.conversationUIService = new ConversationUIService(context);
         this.context = context;
     }
 
@@ -56,7 +56,7 @@ public class ApplozicAudioRecordManager implements MediaRecorder.OnInfoListener,
                 isRecordring = true;
             }
 
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -66,7 +66,7 @@ public class ApplozicAudioRecordManager implements MediaRecorder.OnInfoListener,
             ApplozicAudioRecordManager.this.stopRecording();
         }
 
-        if(outputFile != null){
+        if (outputFile != null) {
             File file = new File(outputFile);
             if (file != null && file.exists()) {
                 Utils.printLog(context, "AudioFRG:", "File deleted...");
@@ -85,7 +85,7 @@ public class ApplozicAudioRecordManager implements MediaRecorder.OnInfoListener,
 
         //FILE CHECK ....
 
-        if(outputFile != null){
+        if (outputFile != null) {
             if (!(new File(outputFile).exists())) {
                 Toast.makeText(context, R.string.tap_on_mic_button_to_record_audio, Toast.LENGTH_SHORT).show();
                 return;
@@ -120,7 +120,7 @@ public class ApplozicAudioRecordManager implements MediaRecorder.OnInfoListener,
         audioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         audioRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
         audioRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-        audioRecorder.setAudioEncodingBitRate(256);
+        audioRecorder.setAudioEncodingBitRate(16 * 44100);
         audioRecorder.setAudioChannels(1);
         audioRecorder.setAudioSamplingRate(44100);
         audioRecorder.setOutputFile(outputFile);

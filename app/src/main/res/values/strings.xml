@@ -69,4 +69,7 @@
     <string name="click_more">Click more</string>
     <string name="press_back_again_to_exit">Press Back again to Exit.</string>
     <string name="log_out_successful">Log out successful</string>
+    <string name="prompt_password_confirm">Confirm Password</string>
+    <string name="error_password_not_matching">Passwords do not match</string>
+    <string name="text_alert_diamond">Yikes !</string>
 </resources>

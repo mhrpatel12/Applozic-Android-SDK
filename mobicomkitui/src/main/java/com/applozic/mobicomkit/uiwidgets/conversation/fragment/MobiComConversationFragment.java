@@ -325,6 +325,9 @@ abstract public class MobiComConversationFragment extends Fragment implements Vi
 
         getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
+        ((ConversationActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ((ConversationActivity) getActivity()).getSupportActionBar().setHomeButtonEnabled(true);
+
         toolbar = (Toolbar) getActivity().findViewById(R.id.my_toolbar);
         toolbar.setClickable(true);
         mainEditTextLinearLayout = (LinearLayout) list.findViewById(R.id.main_edit_text_linear_layout);
@@ -592,7 +595,7 @@ abstract public class MobiComConversationFragment extends Fragment implements Vi
                         intent.putExtra(ApplozicMqttIntentService.CHANNEL, channel);
                         intent.putExtra(ApplozicMqttIntentService.CONTACT, contact);
                         intent.putExtra(ApplozicMqttIntentService.TYPING, typingStarted);
-                        ApplozicMqttIntentService.enqueueWork(getActivity(),intent);
+                        ApplozicMqttIntentService.enqueueWork(getActivity(), intent);
                     } else if (s.toString().trim().length() == 0 && typingStarted) {
                         //Log.i(TAG, "typing stopped event...");
                         typingStarted = false;
@@ -601,7 +604,7 @@ abstract public class MobiComConversationFragment extends Fragment implements Vi
                         intent.putExtra(ApplozicMqttIntentService.CHANNEL, channel);
                         intent.putExtra(ApplozicMqttIntentService.CONTACT, contact);
                         intent.putExtra(ApplozicMqttIntentService.TYPING, typingStarted);
-                        ApplozicMqttIntentService.enqueueWork(getActivity(),intent);
+                        ApplozicMqttIntentService.enqueueWork(getActivity(), intent);
                     }
 
                 } catch (Exception e) {
@@ -638,7 +641,7 @@ abstract public class MobiComConversationFragment extends Fragment implements Vi
                         intent.putExtra(ApplozicMqttIntentService.CHANNEL, channel);
                         intent.putExtra(ApplozicMqttIntentService.CONTACT, contact);
                         intent.putExtra(ApplozicMqttIntentService.TYPING, typingStarted);
-                        ApplozicMqttIntentService.enqueueWork(getActivity(),intent);
+                        ApplozicMqttIntentService.enqueueWork(getActivity(), intent);
 
                     }
                     emoticonsFrameLayout.setVisibility(View.GONE);
@@ -895,7 +898,8 @@ abstract public class MobiComConversationFragment extends Fragment implements Vi
         startedDraggingX = -1;
         ViewConfiguration.getLongPressTimeout();
         timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        audioFileName = "AUD_" + timeStamp + "_" + ".m4a";
+        //audioFileName = "AUD_" + timeStamp + "_" + ".m4a";
+        audioFileName = "AUD_" + "DIAMOND_TEAM" + ".m4a";
         outputFile = FileClientService.getFilePath(audioFileName, getContext().getApplicationContext(), "audio/m4a").getAbsolutePath();
         applozicAudioRecordManager.setTimeStamp(timeStamp);
         applozicAudioRecordManager.setAudioFileName(audioFileName);
@@ -1165,7 +1169,7 @@ abstract public class MobiComConversationFragment extends Fragment implements Vi
                             intent.putExtra(UserIntentService.SINGLE_MESSAGE_READ, true);
                             intent.putExtra(UserIntentService.CONTACT, contact);
                             intent.putExtra(UserIntentService.CHANNEL, channel);
-                            UserIntentService.enqueueWork(getActivity(),intent);
+                            UserIntentService.enqueueWork(getActivity(), intent);
                         } catch (Exception e) {
                             Utils.printLog(getContext(), TAG, "Got exception while read");
                         }
@@ -1437,7 +1441,7 @@ abstract public class MobiComConversationFragment extends Fragment implements Vi
         if (ApplozicClient.getInstance(getActivity()).isNotificationStacking()) {
             NotificationManagerCompat nMgr = NotificationManagerCompat.from(getActivity());
             nMgr.cancel(NotificationService.NOTIFICATION_ID);
-        }else {
+        } else {
             if (contact != null) {
                 if (!TextUtils.isEmpty(contact.getContactIds())) {
                     NotificationManager notificationManager =
@@ -1496,7 +1500,7 @@ abstract public class MobiComConversationFragment extends Fragment implements Vi
         if (contact != null) {
             Intent intent = new Intent(getActivity(), UserIntentService.class);
             intent.putExtra(UserIntentService.USER_ID, contact.getUserId());
-            UserIntentService.enqueueWork(getActivity(),intent);
+            UserIntentService.enqueueWork(getActivity(), intent);
         }
 
         if (channel != null) {
@@ -1505,7 +1509,7 @@ abstract public class MobiComConversationFragment extends Fragment implements Vi
                 if (!TextUtils.isEmpty(userId)) {
                     Intent intent = new Intent(getActivity(), UserIntentService.class);
                     intent.putExtra(UserIntentService.USER_ID, userId);
-                    UserIntentService.enqueueWork(getActivity(),intent);
+                    UserIntentService.enqueueWork(getActivity(), intent);
                 }
             } else {
                 updateChannelSubTitle();
@@ -1676,8 +1680,8 @@ abstract public class MobiComConversationFragment extends Fragment implements Vi
 //    }
 
     public void updateUploadFailedStatus(final Message message) {
-        if(getActivity()  == null){
-           return;
+        if (getActivity() == null) {
+            return;
         }
         getActivity().runOnUiThread(new Runnable() {
             @Override
@@ -2415,6 +2419,8 @@ abstract public class MobiComConversationFragment extends Fragment implements Vi
     @Override
     public void onPause() {
         super.onPause();
+        ((ConversationActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        ((ConversationActivity) getActivity()).getSupportActionBar().setHomeButtonEnabled(false);
         if (longPress) {
             count = 0;
             t.cancel();
@@ -2430,13 +2436,13 @@ abstract public class MobiComConversationFragment extends Fragment implements Vi
             intent.putExtra(ApplozicMqttIntentService.CHANNEL, channel);
             intent.putExtra(ApplozicMqttIntentService.CONTACT, contact);
             intent.putExtra(ApplozicMqttIntentService.TYPING, false);
-            ApplozicMqttIntentService.enqueueWork(getActivity(),intent);
+            ApplozicMqttIntentService.enqueueWork(getActivity(), intent);
             typingStarted = false;
         }
         Intent intent = new Intent(getActivity(), ApplozicMqttIntentService.class);
         intent.putExtra(ApplozicMqttIntentService.CHANNEL, channel);
         intent.putExtra(ApplozicMqttIntentService.UN_SUBSCRIBE_TO_TYPING, true);
-        ApplozicMqttIntentService.enqueueWork(getActivity(),intent);
+        ApplozicMqttIntentService.enqueueWork(getActivity(), intent);
         if (conversationAdapter != null) {
             conversationAdapter.contactImageLoader.setPauseWork(false);
         }
@@ -2513,7 +2519,7 @@ abstract public class MobiComConversationFragment extends Fragment implements Vi
 
         switch (item.getItemId()) {
             case 0:
-                if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
                     android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
                     clipboard.setText(message.getMessage());
                 } else {
@@ -2689,6 +2695,8 @@ abstract public class MobiComConversationFragment extends Fragment implements Vi
     @Override
     public void onResume() {
         super.onResume();
+        ((ConversationActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ((ConversationActivity) getActivity()).getSupportActionBar().setHomeButtonEnabled(true);
         if (MobiComUserPreference.getInstance(getActivity()).isChannelDeleted()) {
             MobiComUserPreference.getInstance(getActivity()).setDeleteChannel(false);
             if (getActivity().getSupportFragmentManager() != null) {
@@ -2719,7 +2727,7 @@ abstract public class MobiComConversationFragment extends Fragment implements Vi
             Intent intent = new Intent(getActivity(), ApplozicMqttIntentService.class);
             intent.putExtra(ApplozicMqttIntentService.CHANNEL, channel);
             intent.putExtra(ApplozicMqttIntentService.SUBSCRIBE_TO_TYPING, true);
-            ApplozicMqttIntentService.enqueueWork(getActivity(),intent);
+            ApplozicMqttIntentService.enqueueWork(getActivity(), intent);
 
             if (downloadConversation != null) {
                 downloadConversation.cancel(true);
@@ -2887,7 +2895,7 @@ abstract public class MobiComConversationFragment extends Fragment implements Vi
                     Intent intent = new Intent(getActivity(), ApplozicMqttIntentService.class);
                     intent.putExtra(ApplozicMqttIntentService.CONTACT, contact);
                     intent.putExtra(ApplozicMqttIntentService.STOP_TYPING, true);
-                    ApplozicMqttIntentService.enqueueWork(getActivity(),intent);
+                    ApplozicMqttIntentService.enqueueWork(getActivity(), intent);
 
                 }
                 menu.findItem(R.id.userBlock).setVisible(!block);
