@@ -551,11 +551,11 @@ public class MobiComUserPreference {
         sharedPreferences.edit().putString(notification_sound_fileName, soundUri).commit();
     }
 
-    public boolean getNotification_sound_enabled() {
-        return sharedPreferences.getBoolean(notification_sound_enabled, false);
+    public boolean getNotificationSoundEnabled() {
+        return sharedPreferences.getBoolean(notification_sound_enabled, true);
     }
 
-    public void setNotification_sound_enabled(boolean notification_sound_enabled) {
+    public void setNotificationSoundEnabled(boolean notification_sound_enabled) {
         sharedPreferences.edit().putBoolean(this.notification_sound_enabled, notification_sound_enabled).commit();
     }
 

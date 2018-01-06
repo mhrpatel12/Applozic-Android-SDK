@@ -127,7 +127,7 @@ public class NotificationService {
                         .setCategory(NotificationCompat.CATEGORY_MESSAGE)
                         .setPriority(NotificationCompat.PRIORITY_MAX)
                         .setWhen(System.currentTimeMillis());
-        if (MobiComUserPreference.getInstance(context).getNotification_sound_enabled()) {
+        if (MobiComUserPreference.getInstance(context).getNotificationSoundEnabled()) {
             mBuilder.setSound(TextUtils.isEmpty(MobiComUserPreference.getInstance(context).getNotificationSoundFilePath()) ? RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION) : Uri.parse(MobiComUserPreference.getInstance(context).getNotificationSoundFilePath()));
         }
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
@@ -363,7 +363,7 @@ public class NotificationService {
         mBuilder.setWhen(System.currentTimeMillis());
         mBuilder.setContentTitle(title);
         mBuilder.setContentText(channel != null && !Channel.GroupType.GROUPOFTWO.getValue().equals(channel.getType()) ? displayNameContact.getDisplayName() + ": " + notificationText : notificationText);
-        if (MobiComUserPreference.getInstance(context).getNotification_sound_enabled()) {
+        if (MobiComUserPreference.getInstance(context).getNotificationSoundEnabled()) {
             mBuilder.setSound(TextUtils.isEmpty(MobiComUserPreference.getInstance(context).getNotificationSoundFilePath()) ? RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION) : Uri.parse(MobiComUserPreference.getInstance(context).getNotificationSoundFilePath()));
         }
         mBuilder.setContentIntent(pendingIntent);
