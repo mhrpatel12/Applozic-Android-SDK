@@ -1278,6 +1278,7 @@ abstract public class MobiComConversationFragment extends Fragment implements Vi
         if (channel != null) {
             menu.findItem(R.id.dial).setVisible(false);
             menu.findItem(R.id.video_call).setVisible(false);
+            menu.findItem(R.id.endSession).setVisible(true);
 
             if (Channel.GroupType.GROUPOFTWO.getValue().equals(channel.getType())) {
                 String userId = ChannelService.getInstance(getActivity()).getGroupOfTwoReceiverUserId(channel.getKey());
@@ -1388,6 +1389,9 @@ abstract public class MobiComConversationFragment extends Fragment implements Vi
             } else if (contact != null) {
                 unMuteUserChat();
             }
+        }
+        if (id == R.id.endSession) {
+            Toast.makeText(getContext(),"Your action",Toast.LENGTH_LONG).show();
         }
         return false;
     }

@@ -132,4 +132,11 @@
         android:showAsAction="collapseActionView"
         android:title="@string/logout"
         android:visible="false" />
+    <item
+        android:id="@+id/endSession"
+        android:orderInCategory="13"
+        android:showAsAction="collapseActionView"
+        android:title="@string/end_session"
+        android:visible="false"
+        mobicomkit:showAsAction="collapseActionView" />
 </menu>
