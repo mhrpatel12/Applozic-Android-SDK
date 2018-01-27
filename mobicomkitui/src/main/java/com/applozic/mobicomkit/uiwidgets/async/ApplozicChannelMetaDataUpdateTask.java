@@ -23,7 +23,7 @@ public class ApplozicChannelMetaDataUpdateTask extends AsyncTask<Void, Void, Boo
     ChannelMetaDataUpdateListener channelMetaDataUpdateListener;
     ChannelService channelService;
     Exception exception;
-    String updateNameResponse;
+    String updateMetaDataResponse;
     String clientGroupId;
     String imageUrl;
     GroupInfoUpdate groupInfoUpdate;
@@ -48,9 +48,9 @@ public class ApplozicChannelMetaDataUpdateTask extends AsyncTask<Void, Void, Boo
                 if (groupInfoUpdate != null && !TextUtils.isEmpty(imageUrl)) {
                     groupInfoUpdate.setImageUrl(imageUrl);
                 }
-                updateNameResponse = channelService.updateChannel(groupInfoUpdate);
-                if (!TextUtils.isEmpty(updateNameResponse)) {
-                    return MobiComKitConstants.SUCCESS.equals(updateNameResponse);
+                updateMetaDataResponse = channelService.updateChannel(groupInfoUpdate);
+                if (!TextUtils.isEmpty(updateMetaDataResponse)) {
+                    return MobiComKitConstants.SUCCESS.equals(updateMetaDataResponse);
                 }
             } else {
                 throw new Exception(context.getString(R.string.applozic_userId_error_info_in_logs));
@@ -68,9 +68,9 @@ public class ApplozicChannelMetaDataUpdateTask extends AsyncTask<Void, Void, Boo
         super.onPostExecute(resultBoolean);
 
         if (resultBoolean && channelMetaDataUpdateListener != null) {
-            channelMetaDataUpdateListener.onUpdateSuccess(updateNameResponse, context);
-        } else if (!resultBoolean && exception != null && channelMetaDataUpdateListener != null) {
-            channelMetaDataUpdateListener.onFailure(updateNameResponse, exception, context);
+            channelMetaDataUpdateListener.onUpdateSuccess(updateMetaDataResponse, context);
+        } else if (!resultBoolean && channelMetaDataUpdateListener != null) {
+            channelMetaDataUpdateListener.onFailure(updateMetaDataResponse, exception, context);
         }
     }
 
