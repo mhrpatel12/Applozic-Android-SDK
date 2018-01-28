@@ -58,12 +58,12 @@ public class GroupInfoUpdate extends JsonMarker {
     }
 
     public GroupInfoUpdate(Map<String, String> metadata, int groupId) {
-        getMetadata().putAll(metadata);
+        this.metadata = metadata;
         this.groupId = groupId;
     }
 
     public GroupInfoUpdate(Map<String, String> metadata, String clientGroupId) {
-        getMetadata().putAll(metadata);
+        this.metadata = metadata;
         this.clientGroupId = clientGroupId;
     }
 
