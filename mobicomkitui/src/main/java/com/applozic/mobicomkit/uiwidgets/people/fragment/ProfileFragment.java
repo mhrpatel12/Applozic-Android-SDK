@@ -147,7 +147,7 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        logoutbtn.setVisibility(View.GONE);
+        logoutbtn.setVisibility(View.VISIBLE);
         logoutbtn.setOnClickListener(new View.OnClickListener() {
 
             @Override
