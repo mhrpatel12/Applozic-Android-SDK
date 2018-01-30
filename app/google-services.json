@@ -1,31 +1,27 @@
 {
   "project_info": {
-    "project_number": "195932243324",
-    "firebase_url": "https://mobi-com.firebaseio.com",
-    "project_id": "mobi-com",
-    "storage_bucket": "mobi-com.appspot.com"
+    "project_number": "210087325402",
+    "firebase_url": "https://diamond-team-1510875026097.firebaseio.com",
+    "project_id": "diamond-team-1510875026097",
+    "storage_bucket": "diamond-team-1510875026097.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:195932243324:android:e41916e235f9fc5d",
+        "mobilesdk_app_id": "1:210087325402:android:28fefd12337e05d3",
         "android_client_info": {
-          "package_name": "com.mobicomkit.sample"
+          "package_name": "com.diamondteam.chat"
         }
       },
       "oauth_client": [
         {
-          "client_id": "195932243324-6rjod6pq115k9s9aq1dpu1h7khmu9uhh.apps.googleusercontent.com",
-          "client_type": 3
-        },
-        {
-          "client_id": "195932243324-5ed1p9k0d2avp7dq0kllqmuuup70h2h1.apps.googleusercontent.com",
+          "client_id": "210087325402-cjehge1h4u8esfis2dqmlra0d4m2qs40.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCIPLpD8qMVS7dDaN0MZqUzbB44IpkuA6E"
+          "current_key": "AIzaSyD1gCDdmT2rYLm6tuEqSv6NEcpqmvruyis"
         }
       ],
       "services": {

@@ -302,7 +302,7 @@ public class LoginActivity extends Activity implements ActivityCompat.OnRequestP
                     PushNotificationTask pushNotificationTask = new PushNotificationTask(Applozic.getInstance(context).getDeviceRegistrationId(), pushNotificationTaskListener, context);
                     pushNotificationTask.execute((Void) null);
 
-                    buildContactData();
+                    //buildContactData();
 
                     //starting main MainActivity
 /*                    Intent mainActvity = new Intent(context, MainActivity.class);

@@ -32,7 +32,7 @@
     <string name="ecommerce_chat_button">चैट</string>
     <string name="ecommerce_ad_text">नि: शुल्क विज्ञापन दें</string>
     <string name="ecommerce_text1">संदेश एकीकरण दिखाने के लिए डेमो स्क्रीन, नीचे चैट बटन पर टैप करें</string>
-    <string name="application_key">applozic-sample-app</string>
+    <string name="application_key">134f75a8aba14fc3d57d541d3d977c0d0</string>
     <string name="default_server_url">https://apps.applozic.com</string>
     <string name="default_mqtt_server_url">tcp://apps.applozic.com:1883</string>
     <string name="default_media_location_folder">Applozic</string>

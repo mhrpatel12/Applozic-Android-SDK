@@ -19,7 +19,8 @@ android {
 
 
     defaultConfig {
-        applicationId "com.mobicomkit.sample"
+        //applicationId "com.mobicomkit.sample"
+        applicationId "com.diamondteam.chat"
         minSdkVersion 14
         targetSdkVersion 27
         versionCode 1
