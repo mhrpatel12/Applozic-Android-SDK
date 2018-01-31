@@ -39,7 +39,6 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.ContextMenu;
 import android.view.GestureDetector;
@@ -91,8 +90,10 @@ import com.applozic.mobicomkit.api.notification.MuteNotificationAsync;
 import com.applozic.mobicomkit.api.notification.MuteNotificationRequest;
 import com.applozic.mobicomkit.api.notification.NotificationService;
 import com.applozic.mobicomkit.api.notification.MuteUserNotificationAsync;
+import com.applozic.mobicomkit.api.people.ChannelInfo;
 import com.applozic.mobicomkit.api.people.UserIntentService;
 import com.applozic.mobicomkit.broadcast.BroadcastService;
+import com.applozic.mobicomkit.channel.database.ChannelDatabaseService;
 import com.applozic.mobicomkit.channel.service.ChannelService;
 import com.applozic.mobicomkit.contact.AppContactService;
 import com.applozic.mobicomkit.contact.MobiComVCFParser;
@@ -101,6 +102,7 @@ import com.applozic.mobicomkit.feed.ApiResponse;
 import com.applozic.mobicomkit.uiwidgets.AlCustomizationSettings;
 import com.applozic.mobicomkit.uiwidgets.R;
 import com.applozic.mobicomkit.uiwidgets.async.AlMessageMetadataUpdateTask;
+import com.applozic.mobicomkit.uiwidgets.async.ApplozicChannelMetaDataUpdateTask;
 import com.applozic.mobicomkit.uiwidgets.attachmentview.ApplozicAudioManager;
 import com.applozic.mobicomkit.uiwidgets.attachmentview.ApplozicAudioRecordManager;
 import com.applozic.mobicomkit.uiwidgets.attachmentview.ApplozicDocumentView;
@@ -121,6 +123,7 @@ import com.applozic.mobicomkit.uiwidgets.instruction.InstructionUtil;
 import com.applozic.mobicomkit.uiwidgets.people.fragment.UserProfileFragment;
 import com.applozic.mobicomkit.uiwidgets.schedule.ConversationScheduler;
 import com.applozic.mobicomkit.uiwidgets.schedule.ScheduledTimeHolder;
+import com.applozic.mobicomkit.uiwidgets.uilistener.ALSessionEndCallback;
 import com.applozic.mobicommons.commons.core.utils.DateUtils;
 import com.applozic.mobicommons.commons.core.utils.LocationUtils;
 import com.applozic.mobicommons.commons.core.utils.Support;
@@ -429,7 +432,7 @@ abstract public class MobiComConversationFragment extends Fragment implements Vi
         userNotAbleToChatTextView = (TextView) userNotAbleToChatLayout.findViewById(R.id.user_not_able_to_chat_textView);
         userNotAbleToChatTextView.setTextColor(Color.parseColor(alCustomizationSettings.getUserNotAbleToChatTextColor()));
 
-        if (channel != null && channel.isDeleted()) {
+        if ((channel != null && channel.isDeleted())) {
             userNotAbleToChatTextView.setText(R.string.group_has_been_deleted_text);
         }
 
@@ -1278,7 +1281,11 @@ abstract public class MobiComConversationFragment extends Fragment implements Vi
         if (channel != null) {
             menu.findItem(R.id.dial).setVisible(false);
             menu.findItem(R.id.video_call).setVisible(false);
-            menu.findItem(R.id.endSession).setVisible(true);
+            if ((channel != null) && (channel.getMetadata().get(MobiComKitConstants.GROUP_STATUS) != null && channel.getMetadata().get(MobiComKitConstants.GROUP_STATUS).equals(MobiComKitConstants.GROUP_STATUS_CLOSE))) {
+                menu.findItem(R.id.endSession).setVisible(false);
+            }else{
+                menu.findItem(R.id.endSession).setVisible(true);
+            }
 
             if (Channel.GroupType.GROUPOFTWO.getValue().equals(channel.getType())) {
                 String userId = ChannelService.getInstance(getActivity()).getGroupOfTwoReceiverUserId(channel.getKey());
@@ -1391,7 +1398,27 @@ abstract public class MobiComConversationFragment extends Fragment implements Vi
             }
         }
         if (id == R.id.endSession) {
-            Toast.makeText(getContext(),"Your action",Toast.LENGTH_LONG).show();
+            ApplozicChannelMetaDataUpdateTask.ChannelMetaDataUpdateListener channelMetaDataUpdateListener = new ApplozicChannelMetaDataUpdateTask.ChannelMetaDataUpdateListener() {
+                @Override
+                public void onUpdateSuccess(String response, Context context) {
+                    if (((ALSessionEndCallback) getActivity().getApplication()) != null) {
+                        userNotAbleToChatLayout.setVisibility(VISIBLE);
+                        userNotAbleToChatTextView.setText(getString(R.string.session_end));
+                        individualMessageSendLayout.setVisibility(View.GONE);
+                        ((ALSessionEndCallback) getActivity().getApplication()).sessionEnded(getActivity(), channel);
+                    }
+                }
+
+                @Override
+                public void onFailure(String response, Exception e, Context context) {
+
+                }
+            };
+            Map<String, String> metadata = new HashMap<>();
+            metadata.put(MobiComKitConstants.GROUP_STATUS, MobiComKitConstants.GROUP_STATUS_CLOSE);
+            ApplozicChannelMetaDataUpdateTask applozicChannelMetaDataUpdateTask = new ApplozicChannelMetaDataUpdateTask(getContext(), channel.getKey()
+                    , metadata, channelMetaDataUpdateListener);
+            applozicChannelMetaDataUpdateTask.execute();
         }
         return false;
     }
@@ -3521,6 +3548,12 @@ abstract public class MobiComConversationFragment extends Fragment implements Vi
             }
             loadMore = !nextMessageList.isEmpty();
             createTemplateMessages();
+
+            if ((channel != null) && (channel.getMetadata().get(MobiComKitConstants.GROUP_STATUS) != null && channel.getMetadata().get(MobiComKitConstants.GROUP_STATUS).equals(MobiComKitConstants.GROUP_STATUS_CLOSE))) {
+                userNotAbleToChatLayout.setVisibility(VISIBLE);
+                userNotAbleToChatTextView.setText(getString(R.string.group_closed));
+                individualMessageSendLayout.setVisibility(View.GONE);
+            }
         }
 
     }
