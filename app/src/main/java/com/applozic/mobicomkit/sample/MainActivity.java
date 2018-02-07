@@ -15,6 +15,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,20 +25,32 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.applozic.mobicomkit.ApplozicClient;
+import com.applozic.mobicomkit.api.MobiComKitConstants;
 import com.applozic.mobicomkit.api.account.user.MobiComUserPreference;
 import com.applozic.mobicomkit.api.account.user.UserLogoutTask;
 import com.applozic.mobicomkit.api.conversation.Message;
 import com.applozic.mobicomkit.api.conversation.MessageIntentService;
 import com.applozic.mobicomkit.api.conversation.MobiComConversationService;
+import com.applozic.mobicomkit.api.people.ChannelInfo;
+import com.applozic.mobicomkit.channel.service.ChannelService;
 import com.applozic.mobicomkit.contact.AppContactService;
+import com.applozic.mobicomkit.feed.ChannelFeedApiResponse;
+import com.applozic.mobicomkit.feed.ErrorResponseFeed;
 import com.applozic.mobicomkit.feed.TopicDetail;
+import com.applozic.mobicomkit.uiwidgets.async.AlChannelCreateAsyncTask;
 import com.applozic.mobicomkit.uiwidgets.async.ApplozicConversationCreateTask;
 import com.applozic.mobicomkit.uiwidgets.conversation.ConversationUIService;
+import com.applozic.mobicomkit.uiwidgets.conversation.activity.ChannelCreateActivity;
 import com.applozic.mobicomkit.uiwidgets.conversation.activity.ConversationActivity;
+import com.applozic.mobicomkit.uiwidgets.people.contact.ContactSelectionFragment;
+import com.applozic.mobicommons.commons.core.utils.Utils;
+import com.applozic.mobicommons.people.channel.Channel;
 import com.applozic.mobicommons.people.channel.Conversation;
 import com.applozic.mobicommons.people.contact.Contact;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -162,7 +175,7 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void onSuccess(Context context) {
                     userLogoutTask = null;
-                    Toast.makeText(getBaseContext(),getBaseContext().getString(R.string.log_out_successful), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getBaseContext(), getBaseContext().getString(R.string.log_out_successful), Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(context, LoginActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                     startActivity(intent);
@@ -230,32 +243,64 @@ public class MainActivity extends AppCompatActivity
 //        startActivity(takeOrderIntent);
 //    }
 
-    public void takeOrder(View v) {
-        Conversation conversation = buildConversation();
-        ApplozicConversationCreateTask applozicConversationCreateTask;
-
-        ApplozicConversationCreateTask.ConversationCreateListener conversationCreateListener = new ApplozicConversationCreateTask.ConversationCreateListener() {
+    public void initiateGroupOfTwo() {
+        AlChannelCreateAsyncTask.TaskListenerInterface taskListenerInterface = new AlChannelCreateAsyncTask.TaskListenerInterface() {
             @Override
-            public void onSuccess(Integer conversationId, Context context) {
-                Log.i(TAG, "ConversationID is:" + conversationId);
-                Intent takeOrderIntent = new Intent(context, ConversationActivity.class);
-                takeOrderIntent.putExtra(TAKE_ORDER, true);
-                takeOrderIntent.putExtra(ConversationUIService.CONTEXT_BASED_CHAT, true);
-                takeOrderIntent.putExtra(ConversationUIService.USER_ID, "usertest2");
-                takeOrderIntent.putExtra(ConversationUIService.DEFAULT_TEXT, R.string.intrest_in_chat);
-                takeOrderIntent.putExtra(ConversationUIService.CONVERSATION_ID,conversationId);
-                startActivity(takeOrderIntent);
-
+            public void onSuccess(Channel channel, Context context) {
+                if (channel != null) {
+                    Intent intent = new Intent(MainActivity.this, ConversationActivity.class);
+                    intent.putExtra(ConversationUIService.GROUP_ID, channel.getKey());
+                    intent.putExtra(ConversationUIService.GROUP_NAME, channel.getName());
+                    startActivity(intent);
+                }
             }
 
             @Override
-            public void onFailure(Exception e, Context context) {
-
+            public void onFailure(ChannelFeedApiResponse channelFeedApiResponse, Context context) {
+                if (channelFeedApiResponse != null) {
+                    List<ErrorResponseFeed> error = channelFeedApiResponse.getErrorResponse();
+                    if (error != null && error.size() > 0) {
+                        ErrorResponseFeed errorResponseFeed = error.get(0);
+                        String errorDescription = errorResponseFeed.getDescription();
+                        if (!TextUtils.isEmpty(errorDescription)) {
+                            if (MobiComKitConstants.GROUP_USER_LIMIT_EXCEED.equalsIgnoreCase(errorDescription)) {
+                                Toast.makeText(context, com.applozic.mobicomkit.uiwidgets.R.string.group_members_limit_exceeds, Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(context, com.applozic.mobicomkit.uiwidgets.R.string.applozic_server_error, Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }
+                } else {
+                    Toast.makeText(context, Utils.isInternetAvailable(context) ? com.applozic.mobicomkit.uiwidgets.R.string.applozic_server_error : com.applozic.mobicomkit.uiwidgets.R.string.you_dont_have_any_network_access_info, Toast.LENGTH_SHORT).show();
+                }
             }
         };
-        applozicConversationCreateTask = new ApplozicConversationCreateTask(MainActivity.this, conversationCreateListener, conversation);
-        applozicConversationCreateTask.execute((Void) null);
 
+        List<String> channelMembersList = new ArrayList<String>();
+        String userReceiver = "userEmulator"; // userID for receiving end
+        channelMembersList.add(userReceiver);
+        String itemId = "item1"; // ID for item on which you want to initiate chat
+        ChannelInfo channelInfo = new ChannelInfo("Your Group name", channelMembersList);
+        channelInfo.setType(Channel.GroupType.GROUPOFTWO.getValue().intValue()); //group type
+        channelInfo.setClientGroupId(buildClientGroupID(itemId, userReceiver)); //Optional if you have your own groupId then you can pass here
+        Map<String, String> metaData = new HashMap<>();
+        metaData.put("title", "FORD FIGO DURATEC PETROL ZXI 1.2 (2014)");
+        metaData.put("price", "$1000");
+        metaData.put("link", "https://imguct1.aeplcdn.com/img/300x225/lis/201709/1188774_6855_1_1506405541170.jpeg");
+        channelInfo.setMetadata(metaData);
+        if (ChannelService.getInstance(this).getChannelByClientGroupId(buildClientGroupID(itemId, userReceiver)) == null) {
+            AlChannelCreateAsyncTask alChannelCreateAsyncTask = new AlChannelCreateAsyncTask(this, channelInfo, taskListenerInterface);
+            alChannelCreateAsyncTask.execute((Void) null);
+        } else {
+            Intent intent = new Intent(MainActivity.this, ConversationActivity.class);
+            intent.putExtra(ConversationUIService.GROUP_ID, ChannelService.getInstance(this).getChannelByClientGroupId(buildClientGroupID(itemId, userReceiver)).getKey());
+            intent.putExtra(ConversationUIService.GROUP_NAME, ChannelService.getInstance(this).getChannelByClientGroupId(buildClientGroupID(itemId, userReceiver)).getName());
+            startActivity(intent);
+        }
+    }
+
+    private String buildClientGroupID(String itemID, String receiverID) {
+        return (MobiComUserPreference.getInstance(this).getUserId() + itemID + receiverID);
     }
 
     private Conversation buildConversation() {
