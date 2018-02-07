@@ -98,6 +98,7 @@ import com.applozic.mobicomkit.contact.AppContactService;
 import com.applozic.mobicomkit.contact.MobiComVCFParser;
 import com.applozic.mobicomkit.contact.VCFContactData;
 import com.applozic.mobicomkit.feed.ApiResponse;
+import com.applozic.mobicomkit.feed.TopicDetail;
 import com.applozic.mobicomkit.uiwidgets.AlCustomizationSettings;
 import com.applozic.mobicomkit.uiwidgets.R;
 import com.applozic.mobicomkit.uiwidgets.async.AlMessageMetadataUpdateTask;
@@ -3470,6 +3471,20 @@ abstract public class MobiComConversationFragment extends Fragment implements Vi
             if (conversations != null && conversations.size() > 0) {
                 conversationList = conversations;
             }
+            if (channel != null && !channel.getMetadata().isEmpty()) {
+                if (channel.getMetadata().containsKey("title")) {
+                    Conversation conversation = new Conversation();
+                    conversation.setUserId("usertest2");
+                    conversation.setTopicId("Topic#Id#Test");
+                    TopicDetail topic = new TopicDetail();
+                    topic.setTitle(channel.getMetadata().get("title"));
+                    topic.setSubtitle(channel.getMetadata().get("price"));
+                    topic.setLink(channel.getMetadata().get("link"));
+                    conversation.setTopicDetail(topic.getJson());
+                    conversationList = new ArrayList<>();
+                    conversationList.add(conversation);
+                }
+            }
             if (conversationList != null && conversationList.size() > 0 && !onSelected) {
                 onSelected = true;
                 applozicContextSpinnerAdapter = new ApplozicContextSpinnerAdapter(getActivity(), conversationList);
@@ -3479,7 +3494,7 @@ abstract public class MobiComConversationFragment extends Fragment implements Vi
                     int i = 0;
                     for (Conversation c : conversationList) {
                         i++;
-                        if (c.getId().equals(conversationId)) {
+                        if (c.getId() != null && c.getId().equals(conversationId)) {
                             break;
                         }
                     }
