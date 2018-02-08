@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -243,38 +244,7 @@ public class MainActivity extends AppCompatActivity
 //        startActivity(takeOrderIntent);
 //    }
 
-    public void initiateGroupOfTwo() {
-        AlChannelCreateAsyncTask.TaskListenerInterface taskListenerInterface = new AlChannelCreateAsyncTask.TaskListenerInterface() {
-            @Override
-            public void onSuccess(Channel channel, Context context) {
-                if (channel != null) {
-                    Intent intent = new Intent(MainActivity.this, ConversationActivity.class);
-                    intent.putExtra(ConversationUIService.GROUP_ID, channel.getKey());
-                    intent.putExtra(ConversationUIService.GROUP_NAME, channel.getName());
-                    startActivity(intent);
-                }
-            }
-
-            @Override
-            public void onFailure(ChannelFeedApiResponse channelFeedApiResponse, Context context) {
-                if (channelFeedApiResponse != null) {
-                    List<ErrorResponseFeed> error = channelFeedApiResponse.getErrorResponse();
-                    if (error != null && error.size() > 0) {
-                        ErrorResponseFeed errorResponseFeed = error.get(0);
-                        String errorDescription = errorResponseFeed.getDescription();
-                        if (!TextUtils.isEmpty(errorDescription)) {
-                            if (MobiComKitConstants.GROUP_USER_LIMIT_EXCEED.equalsIgnoreCase(errorDescription)) {
-                                Toast.makeText(context, com.applozic.mobicomkit.uiwidgets.R.string.group_members_limit_exceeds, Toast.LENGTH_SHORT).show();
-                            } else {
-                                Toast.makeText(context, com.applozic.mobicomkit.uiwidgets.R.string.applozic_server_error, Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    }
-                } else {
-                    Toast.makeText(context, Utils.isInternetAvailable(context) ? com.applozic.mobicomkit.uiwidgets.R.string.applozic_server_error : com.applozic.mobicomkit.uiwidgets.R.string.you_dont_have_any_network_access_info, Toast.LENGTH_SHORT).show();
-                }
-            }
-        };
+    public void takeOrder(View view) {
 
         List<String> channelMembersList = new ArrayList<String>();
         String userReceiver = "userEmulator"; // userID for receiving end
@@ -288,19 +258,67 @@ public class MainActivity extends AppCompatActivity
         metaData.put("price", "$1000");
         metaData.put("link", "https://imguct1.aeplcdn.com/img/300x225/lis/201709/1188774_6855_1_1506405541170.jpeg");
         channelInfo.setMetadata(metaData);
-        if (ChannelService.getInstance(this).getChannelByClientGroupId(buildClientGroupID(itemId, userReceiver)) == null) {
-            AlChannelCreateAsyncTask alChannelCreateAsyncTask = new AlChannelCreateAsyncTask(this, channelInfo, taskListenerInterface);
-            alChannelCreateAsyncTask.execute((Void) null);
-        } else {
-            Intent intent = new Intent(MainActivity.this, ConversationActivity.class);
-            intent.putExtra(ConversationUIService.GROUP_ID, ChannelService.getInstance(this).getChannelByClientGroupId(buildClientGroupID(itemId, userReceiver)).getKey());
-            intent.putExtra(ConversationUIService.GROUP_NAME, ChannelService.getInstance(this).getChannelByClientGroupId(buildClientGroupID(itemId, userReceiver)).getName());
-            startActivity(intent);
-        }
+
+        AlCreateGroupOfTwoTask.TaskListenerInterface createGroupOfTwoTaskListener = new AlCreateGroupOfTwoTask.TaskListenerInterface() {
+            @Override
+            public void onSuccess(Channel channel, Context context) {
+                if (channel != null) {
+                    Intent intent = new Intent(MainActivity.this, ConversationActivity.class);
+                    intent.putExtra(ConversationUIService.GROUP_ID, channel.getKey());
+                    intent.putExtra(ConversationUIService.GROUP_NAME, channel.getName());
+                    startActivity(intent);
+                }
+            }
+
+            @Override
+            public void onFailure(String error, Context context) {
+                Toast.makeText(context, error, Toast.LENGTH_LONG).show();
+            }
+        };
+        AlCreateGroupOfTwoTask alCreateGroupOfTwoTask = new AlCreateGroupOfTwoTask(this, channelInfo, createGroupOfTwoTaskListener);
+        alCreateGroupOfTwoTask.execute((Void) null);
     }
 
     private String buildClientGroupID(String itemID, String receiverID) {
         return (MobiComUserPreference.getInstance(this).getUserId() + itemID + receiverID);
+    }
+
+    public static class AlCreateGroupOfTwoTask extends AsyncTask<Void, Void, Channel> {
+        Context context;
+        ChannelService channelService;
+        ChannelInfo channelInfo;
+        TaskListenerInterface taskListenerInterface;
+
+        public AlCreateGroupOfTwoTask(Context context, ChannelInfo channelInfo, TaskListenerInterface taskListenerInterface) {
+            this.context = context;
+            this.taskListenerInterface = taskListenerInterface;
+            this.channelInfo = channelInfo;
+            this.channelService = ChannelService.getInstance(context);
+        }
+
+        @Override
+        protected Channel doInBackground(Void[] params) {
+            if (channelInfo != null) {
+                return channelService.createGroupOfTwo(channelInfo);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Channel channel) {
+            super.onPostExecute(channel);
+            if (channel != null) {
+                taskListenerInterface.onSuccess(channel, context);
+            } else {
+                taskListenerInterface.onFailure("Some error occured", context);
+            }
+        }
+
+        public interface TaskListenerInterface {
+            void onSuccess(Channel channel, Context context);
+
+            void onFailure(String error, Context context);
+        }
     }
 
     private Conversation buildConversation() {
