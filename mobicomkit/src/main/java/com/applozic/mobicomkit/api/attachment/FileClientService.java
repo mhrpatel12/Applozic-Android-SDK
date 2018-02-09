@@ -100,7 +100,11 @@ public class FileClientService extends MobiComKitClientService {
     }
 
     public String profileImageUploadURL() {
-        return getBaseUrl() + AL_UPLOAD_FILE_URL;
+        if (ApplozicClient.getInstance(context).isStorageServiceEnabled()) {
+            return getFileUploadUrl()+"/image";
+        }else{
+            return getBaseUrl() + AL_UPLOAD_FILE_URL;
+        }
     }
 
     public String getFileUploadUrl() {
@@ -176,7 +180,7 @@ public class FileClientService extends MobiComKitClientService {
             String fileName = fileMeta.getName();
             file = FileClientService.getFilePath(fileName, context.getApplicationContext(), contentType);
             if (!file.exists()) {
-                if (ApplozicClient.getInstance(context).isCustomStorageServiceEnabled() && !TextUtils.isEmpty(message.getFileMetas().getUrl())) {
+                if (!TextUtils.isEmpty(message.getFileMetas().getUrl())) {
                     connection = openHttpConnection(fileMeta.getUrl());
                 } else {
                     connection = openHttpConnection(new MobiComKitClientService(context).getFileUrl() + fileMeta.getBlobKeyString());
@@ -259,7 +263,7 @@ public class FileClientService extends MobiComKitClientService {
     }
 
     public String getUploadKey() {
-        if (ApplozicClient.getInstance(context).isStorageServiceEnabled() || ApplozicClient.getInstance(context).isCustomStorageServiceEnabled() ) {
+        if (ApplozicClient.getInstance(context).isStorageServiceEnabled() || ApplozicClient.getInstance(context).isCustomStorageServiceEnabled()) {
             return getFileUploadUrl();
         } else {
             return httpRequestUtils.getResponse(getFileUploadUrl()
@@ -358,7 +362,11 @@ public class FileClientService extends MobiComKitClientService {
     public String uploadProfileImage(String path) throws UnsupportedEncodingException {
         try {
             ApplozicMultipartUtility multipart = new ApplozicMultipartUtility(profileImageUploadURL(), "UTF-8", context);
-            multipart.addFilePart("file", new File(path), null);
+            if (ApplozicClient.getInstance(context).isStorageServiceEnabled()) {
+                multipart.addFilePart("files[]", new File(path), null);
+            } else {
+                multipart.addFilePart("file", new File(path), null);
+            }
             return multipart.getResponse();
         } catch (Exception e) {
             e.printStackTrace();
@@ -469,8 +477,11 @@ public class FileClientService extends MobiComKitClientService {
     }
 
     public String getThumbnailUrl(String thumbnailUrl) {
-        return (ApplozicClient.getInstance(context).isStorageServiceEnabled() ?
-                (getFileBaseUrl() + THUMBNAIL_URL + thumbnailUrl) : thumbnailUrl);
-
+        if ((thumbnailUrl != null) && (thumbnailUrl.matches("^(https?)://.*$"))) {
+            return thumbnailUrl;
+        } else {
+            return (ApplozicClient.getInstance(context).isStorageServiceEnabled() ?
+                    (getFileBaseUrl() + THUMBNAIL_URL + (thumbnailUrl + "")) : thumbnailUrl + "");
+        }
     }
 }

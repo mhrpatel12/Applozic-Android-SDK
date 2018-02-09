@@ -169,7 +169,7 @@ class AttachmentDownloader extends MobiComKitClientService implements Runnable {
             file = FileClientService.getFilePath(fileName, context.getApplicationContext(), contentType);
             if (!file.exists()) {
 
-                if (ApplozicClient.getInstance(context).isCustomStorageServiceEnabled() && !TextUtils.isEmpty(message.getFileMetas().getUrl())) {
+                if (!TextUtils.isEmpty(message.getFileMetas().getUrl())) {
                     connection = openHttpConnection(fileMeta.getUrl());
                 } else {
                     connection = openHttpConnection(new MobiComKitClientService(context).getFileUrl() + fileMeta.getBlobKeyString());

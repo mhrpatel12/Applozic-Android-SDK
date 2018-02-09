@@ -270,7 +270,7 @@ public class LoginActivity extends Activity implements ActivityCompat.OnRequestP
                     //Basic settings...
 
                     ApplozicClient.getInstance(context).setContextBasedChat(true).setHandleDial(true);
-
+                    ApplozicClient.getInstance(context).setStorageServiceEnabled(true);
                     Map<ApplozicSetting.RequestCode, String> activityCallbacks = new HashMap<ApplozicSetting.RequestCode, String>();
                     activityCallbacks.put(ApplozicSetting.RequestCode.USER_LOOUT, LoginActivity.class.getName());
                     ApplozicSetting.getInstance(context).setActivityCallbacks(activityCallbacks);
