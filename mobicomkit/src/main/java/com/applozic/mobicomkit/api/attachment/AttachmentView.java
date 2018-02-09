@@ -198,7 +198,7 @@ public class AttachmentView extends ImageView {
         if (message == null || message.getFileMetas() == null) {
             return null;
         }
-        if (ApplozicClient.getInstance(context).isCustomStorageServiceEnabled() && !TextUtils.isEmpty(message.getFileMetas().getUrl())) {
+        if (!TextUtils.isEmpty(message.getFileMetas().getUrl())) {
             return message.getFileMetas().getUrl();
         } else {
             return new MobiComKitClientService(getContext().getApplicationContext()).getFileUrl() + message.getFileMetas().getBlobKeyString();
