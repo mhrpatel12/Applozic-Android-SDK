@@ -101,8 +101,8 @@ public class FileClientService extends MobiComKitClientService {
 
     public String profileImageUploadURL() {
         if (ApplozicClient.getInstance(context).isStorageServiceEnabled()) {
-            return getFileUploadUrl()+"/image";
-        }else{
+            return getFileUploadUrl() + "/image";
+        } else {
             return getBaseUrl() + AL_UPLOAD_FILE_URL;
         }
     }
@@ -123,7 +123,7 @@ public class FileClientService extends MobiComKitClientService {
         try {
             Bitmap attachedImage = null;
             FileMeta fileMeta = message.getFileMetas();
-            String thumbnailUrl = fileMeta.getThumbnailUrl();
+            String thumbnailUrl = httpRequestUtils.getResponse(new MobiComKitClientService(context).getFileAuthBaseUrl(message.getFileMetas().getThumbnailBlobKey()), "application/json", "application/json");
             String contentType = fileMeta.getContentType();
             final BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
