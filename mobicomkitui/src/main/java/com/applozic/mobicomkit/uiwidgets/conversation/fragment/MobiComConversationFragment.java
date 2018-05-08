@@ -13,7 +13,9 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.location.Location;
@@ -40,6 +42,7 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
+import android.util.Patterns;
 import android.util.TypedValue;
 import android.view.ContextMenu;
 import android.view.GestureDetector;
@@ -137,12 +140,16 @@ import com.applozic.mobicommons.people.channel.ChannelUserMapper;
 import com.applozic.mobicommons.people.channel.ChannelUtils;
 import com.applozic.mobicommons.people.channel.Conversation;
 import com.applozic.mobicommons.people.contact.Contact;
+import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Type;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -263,6 +270,7 @@ abstract public class MobiComConversationFragment extends Fragment implements Vi
     private EditText errorEditTextView;
     private RecyclerView messageTemplateView;
     private ImageView audioRecordIconImageView;
+    private ImageView imageChatBackground;
     WeakReference<ImageButton> recordButtonWeakReference;
     RecyclerView recyclerView;
     RecyclerViewPositionHelper recyclerViewPositionHelper;
@@ -346,6 +354,7 @@ abstract public class MobiComConversationFragment extends Fragment implements Vi
         mainEditTextLinearLayout = (LinearLayout) list.findViewById(R.id.main_edit_text_linear_layout);
         audioRecordFrameLayout = (FrameLayout) list.findViewById(R.id.audio_record_frame_layout);
         messageTemplateView = (RecyclerView) list.findViewById(R.id.mobicomMessageTemplateView);
+        imageChatBackground = (ImageView) list.findViewById(R.id.imageBackground);
         Configuration config = getResources().getConfiguration();
         recordButtonWeakReference = new WeakReference<ImageButton>(recordButton);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
@@ -361,7 +370,7 @@ abstract public class MobiComConversationFragment extends Fragment implements Vi
         if (alCustomizationSettings.isPoweredByApplozic()) {
             list.findViewById(R.id.txtPoweredByApplozic).setVisibility(VISIBLE);
         }
-
+        setChatBackground(MobiComUserPreference.getInstance(getActivity()).getChatBackground());
         extendedSendingOptionLayout = (LinearLayout) list.findViewById(R.id.extended_sending_option_layout);
 
         attachmentLayout = (RelativeLayout) list.findViewById(R.id.attachment_layout);
@@ -3456,6 +3465,23 @@ abstract public class MobiComConversationFragment extends Fragment implements Vi
             type = "text";
         }
         return type;
+    }
+
+    public void setChatBackground(String imagePath) {
+        try {
+            if (Patterns.WEB_URL.matcher(imagePath).matches()) {
+                Glide.with(getActivity()).load(imagePath).into(imageChatBackground);
+            } else {
+                File imgFile = new File(imagePath);
+                if (imgFile != null) {
+                    Bitmap image = BitmapFactory.decodeFile(imagePath);
+                    BitmapDrawable background = new BitmapDrawable(image);
+                    getActivity().getWindow().setBackgroundDrawable(background);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public class DownloadConversation extends AsyncTask<Void, Integer, Long> {

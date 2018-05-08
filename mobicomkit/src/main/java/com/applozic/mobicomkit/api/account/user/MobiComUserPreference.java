@@ -72,6 +72,7 @@ public class MobiComUserPreference {
     private static String contact_sync_time = "contact_sync_time";
     private static String device_contact_sync_time = "device_contact_sync_time";
     private static String PARENT_GROUP_KEY = "PARENT_GROUP_KEY";
+    private static String CHAT_BACKGROUND = "CHAT_BACKGROUND";
 
     private static SharedPreferences sharedPreferences;
     private Context context;
@@ -815,5 +816,13 @@ public class MobiComUserPreference {
 
     public void setParentGroupKey(Integer parentGroupKey) {
         sharedPreferences.edit().putInt(PARENT_GROUP_KEY, parentGroupKey).commit();
+    }
+
+    public String getChatBackground() {
+        return sharedPreferences.getString(CHAT_BACKGROUND, "");
+    }
+
+    public void setChatBackground(String chat_background) {
+        sharedPreferences.edit().putString(CHAT_BACKGROUND, chat_background).commit();
     }
 }
