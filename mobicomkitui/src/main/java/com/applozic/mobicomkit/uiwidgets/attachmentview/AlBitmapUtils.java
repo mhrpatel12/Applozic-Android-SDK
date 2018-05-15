@@ -9,8 +9,6 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.DownsampleStrategy;
-import com.bumptech.glide.request.RequestOptions;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -38,24 +36,19 @@ public class AlBitmapUtils {
         }
 
         byte[] bytes;
-        Bitmap scaledBitMap;
+        Bitmap scaledBitMap = null;
         try {
 
-            RequestOptions req = new RequestOptions();
-            req.downsample(DownsampleStrategy.AT_MOST);
-            Drawable drawable = null;
-
             if (fragmentActivity != null) {
-                drawable = Glide.with(fragmentActivity).load(uri).apply(req).submit(600, 600).get();
+                scaledBitMap = Glide.with(fragmentActivity).load(uri).asBitmap().into(600, 600).get();
 
             } else if (context != null) {
-                drawable = Glide.with(context).load(uri).apply(req).submit(600, 600).get();
+                scaledBitMap = Glide.with(context).load(uri).asBitmap().into(600, 600).get();
             }
 
-            if (drawable == null) {
+            if (scaledBitMap == null) {
                 return false;
             }
-            scaledBitMap = ((BitmapDrawable) drawable).getBitmap();
 
             if (scaledBitMap != null) {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
