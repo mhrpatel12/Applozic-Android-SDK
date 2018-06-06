@@ -221,6 +221,38 @@
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />
 
+        <!-- Pushy Declarations -->
+
+        <!-- Pushy Notification Receiver -->
+        <!-- Incoming push notifications will invoke the following BroadcastReceiver -->
+        <receiver android:name=".pushnotification.PushReceiver" android:exported="false">
+            <intent-filter>
+                <!-- Do not modify this -->
+                <action android:name="pushy.me" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Pushy Update Receiver -->
+        <!-- Do not modify - internal BroadcastReceiver that restarts the listener service -->
+        <receiver android:name="me.pushy.sdk.receivers.PushyUpdateReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_REPLACED" />
+                <data android:scheme="package" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Pushy Boot Receiver -->
+        <!-- Do not modify - internal BroadcastReceiver that restarts the listener service -->
+        <receiver android:name="me.pushy.sdk.receivers.PushyBootReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+
+        <!-- Pushy Socket Service -->
+        <!-- Do not modify - internal socket service -->
+        <service android:name="me.pushy.sdk.services.PushySocketService"/>
+
         <receiver
             android:name="com.applozic.mobicomkit.broadcast.ConnectivityReceiver"
             android:enabled="true"

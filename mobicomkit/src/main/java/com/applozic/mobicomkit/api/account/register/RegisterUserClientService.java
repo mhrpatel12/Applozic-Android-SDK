@@ -126,7 +126,7 @@ public class RegisterUserClientService extends MobiComKitClientService {
         mobiComUserPreference.setContactNumber(user.getContactNumber());
         mobiComUserPreference.setEmailVerified(user.isEmailVerified());
         mobiComUserPreference.setDisplayName(user.getDisplayName());
-        mobiComUserPreference.setMqttBrokerUrl(registrationResponse.getBrokerUrl());
+        mobiComUserPreference.setMqttBrokerUrl("asdasd.com");
         mobiComUserPreference.setDeviceKeyString(registrationResponse.getDeviceKey());
         mobiComUserPreference.setEmailIdValue(user.getEmail());
         mobiComUserPreference.setImageLink(user.getImageLink());

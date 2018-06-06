@@ -355,6 +355,7 @@ public class LoginActivity extends Activity implements ActivityCompat.OnRequestP
             user.setPassword(password);
             user.setDisplayName(displayName);
             user.setContactNumber(phoneNumber);
+            user.setPushNotificationFormat(Short.valueOf("4"));
             user.setAuthenticationTypeId(authenticationType.getValue());
 
             mAuthTask = new UserLoginTask(user, listener, this);

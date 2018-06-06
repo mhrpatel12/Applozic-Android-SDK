@@ -9,6 +9,9 @@ import com.applozic.mobicomkit.api.account.user.MobiComUserPreference;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
 
+import me.pushy.sdk.Pushy;
+import me.pushy.sdk.util.exceptions.PushyException;
+
 /**
  * Created by sunil on 9/4/16.
  */
@@ -20,7 +23,12 @@ public class FcmInstanceIDListenerService extends FirebaseInstanceIdService {
     public void onTokenRefresh() {
         super.onTokenRefresh();
 
-        String registrationId = FirebaseInstanceId.getInstance().getToken();
+        String registrationId = "";
+        try {
+            registrationId = Pushy.register(getApplicationContext());
+        } catch (PushyException e) {
+            e.printStackTrace();
+        }
         Log.i(TAG, "Found Registration Id:" + registrationId);
         Applozic.getInstance(this).setDeviceRegistrationId(registrationId);
         if (MobiComUserPreference.getInstance(this).isRegistered()) {
@@ -30,6 +38,5 @@ public class FcmInstanceIDListenerService extends FirebaseInstanceIdService {
                 e.printStackTrace();
             }
         }
-
     }
 }

@@ -110,6 +110,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import me.pushy.sdk.Pushy;
+
 
 /**
  * Created by devashish on 6/25/2015.
@@ -337,6 +339,9 @@ public class ConversationActivity extends AppCompatActivity implements MessageCo
         if (resourceId != 0) {
             getWindow().setBackgroundDrawableResource(resourceId);
         }
+
+        Pushy.listen(this);
+
         setContentView(R.layout.quickconversion_activity);
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
